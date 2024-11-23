@@ -246,7 +246,7 @@
   + :focus（选中获取焦点的输入类表单元素）
 
     ```css
-    inpput:focus {
+    input:focus {
         color:white;
     }
     ```
