@@ -438,7 +438,11 @@ arr.shift   // 删除第一个元素
 
 
 
-#### 五、事件监听
+### 事件
+
+------
+
+#### 一、事件监听
 
 + 事件监听语法与分类
 
@@ -468,8 +472,8 @@ arr.shift   // 删除第一个元素
   + 事件对象属性
 
     + type：返回事件的类型，如click，mouseover，keydown等
-    + target：触发时间的元素（事件的目标节点）
-    + currentTarget：事件绑定的元素（事件侦听器绑定的节点，在事件捕获或冒泡阶段可能不同）
+    + target：触发事件的元素（事件的目标节点），在事件冒泡阶段，target始终指向触发事件的元素
+    + currentTarget：事件绑定的元素，随着事件流的冒泡，current的值会指向当前元素
     + preventDefault（）方法调用的结果会存储在defaultPrevented属性中
     + stopPropagation（）方法调用的结果会影响isPropageationStopped属性
     + timeStamp：事件发生的时间戳（以毫秒为单位，从1970年1月1日00:00:00 UTC开始计算）
@@ -516,7 +520,7 @@ arr.shift   // 删除第一个元素
 
 
 
-#### 六、事件进阶知识
+#### 二、事件进阶知识
 
 + 环境对象
 
@@ -531,3 +535,78 @@ arr.shift   // 删除第一个元素
   5. 显式绑定：在js中可以通过一些方法改变this的指向
   6. 事件处理函数：在事件处理函数中，this指向的是触发事件的元素，若事件处理函数使用箭头函数，其指向的是上文中的this
   7. 对象方法调用：若是通过对象.方法（）,在方法执行过程中this指向的是调用方法的对象
+
+
+
+#### 三、事件流
+
++ 事件流、事件捕获、事件冒泡
+
+  事件流是指当用户在网页上执行某些操作（如点击、输入、鼠标移动等）时，会触发相应的事件，这些事件会在DOM树中按照特定的顺序传播和处理。事件流包括事件捕获阶段、目标阶段和事件冒泡阶段。
+
+  **事件的传播顺序是固定的：先捕获后冒泡。但可以通过`addEventListener`方法的第三个参数来控制事件处理函数的触发顺序（设置为`true`表示在捕获阶段触发，设置为`false`或省略表示在冒泡阶段触发）。**
+
+  事件捕获是指当事件触发时，会从document对象或windows对象等祖先节点，根据DOM树依次向下传播，且在传播过程中事件的第三个参数为true的函数为捕获阶段函数，这些函数会依次触发。事件会途经每一个祖先元素，直到达到触发事件的具体目标
+
+  目标阶段：当事件到达目标元素后，对应函数会被执行
+
+  冒泡阶段：事件从目标元素开始向上冒泡，沿着相反的路径传播到文档的根节点，在冒泡阶段可以使用event.target属性获取触发事件的元素，从而在一个事件处理函数中处理来自不同子元素的事件。
+
+  **事件的传播是可以通过event.stopPropagation()阻止的**，无论冒泡还是捕获，被阻止后都会停止
+
+  
+
++ 事件解绑
+
+  + 使用removeEventListener
+
+    请注意，通过匿名函数绑定事件是不能解绑事件的
+
+    ```js
+    // 添加事件监听器
+    const button = document.getElementById('myButton');
+    function handleClick() {
+        console.log('Button clicked!');
+    }
+    button.addEventListener('click', handleClick);
+    
+    // 移除事件监听器
+    button.removeEventListener('click', handleClick);
+    ```
+
+  + 一次性事件监听
+
+    ```js
+    button.addEventListener('click', handleClick, { once: true });
+    // 这个监听器将在第一次点击后被自动移除
+    ```
+
+
+
++ 事件委托
+
+  + 事件委托定义与好处
+
+    事件委托（Event Delegation）是JavaScript中一种重要且高效的事件处理机制。其核心思想是将事件监听器绑定到父元素上，而不是直接绑定到目标元素上。
+
+    + 提升性能、简化代码
+    + 支持动态元素：即使是页面加载后动态添加的元素，也可以通过事件委托（事件代理）触发父元素的监听器
+
+    ```css
+    <!-- 若想实现点击某个li使其变色，在不适用代理的情况下，需要为每一个元素添加点击事件 -->
+    <ul class="list">
+    	<li>1</li>
+    	<li>2</li>
+    	<li>3</li>
+    </ul>
+    <script>
+    	const ul = document.querySelectorAll('#list')   // 获取list元素
+        ul.addEventListener('click',function(event){
+    		const target = event.target
+            target.classList.toggle('change')
+        })
+    	
+    </script>
+    ```
+
+    
