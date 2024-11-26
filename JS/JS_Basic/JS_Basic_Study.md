@@ -346,6 +346,40 @@ arr.shift   // 删除第一个元素
   const elementList = document.quertSelectorAll('CSS选择器')
   ```
 
++ 通过DOM树获取节点
+
+  ```js
+  // 可以通过当前节点获取其父节点，子节点以及兄弟节点
+  const son = document.querySelector('.son')
+  console.log(son)
+  // 父节点
+  console.log(son.parentNode)
+  // 子节点
+  console.log(son.children)
+  // 兄弟节点
+  console.log(son.nextElementSibling)  // 弟弟节点
+  console.log(son.previousElementSibling) // 哥哥节点
+  ```
+  
++ 新增节点
+
+  ```js
+// 创建一个新的元素节点
+  const 元素 = document.createElement('标签名')
+  // 设置新增节点的位置
+  父元素.appendChild(元素)  // 插入至父元素的最后一个子元素后
+父元素.insertBefore(要插入的元素，在哪个元素前面)  //插入至指定子元素前
+  ```
+
++ 节点克隆与删除节点
+
+  ```js
+  // 删除指定元素
+  父元素.removeChild(要删除的元素)
+  ```
+  
+  
+  
 + 其他方式（不重要）
 
   + 通过ID获取元素getElementById()
@@ -609,4 +643,312 @@ arr.shift   // 删除第一个元素
     </script>
     ```
 
+
+
+
+#### 四、页面事件
+
++ 页面加载事件（load）
+
+  等待页面所有资源加载完毕，就回去执行回调函数，且是通过window添加事件监听
+
+  ```js
+  // 页面所有资源加载完毕，该回调函数才会执行
+  window.addEventListener('load',function(){
+      
+  })
+  ```
+
+  
+
++ DOMContentLoaded加载
+
+  当初始的HTML文档被完全加载和解析完成后，DOMContentLoaded事件被触发，无需等待样式表、图像等完全加载
+
+  ```js
+  document.addEventListener('DOMContentLoaded',function(){
+      
+  })
+  ```
+
+  
+
++ 页面滚动事件 scroll
+
+  网页需要检测用户把页面滚动到某个区域后做一些处理，比如固定导航栏，比如返回顶部
+
+  ```js
+  window.addEventListener('scroll',function(){
+      // 获取html的写法
+      document.documentElement
+  })
+  
+  div.addEventListener('scroll',function(){
+      // 可以通过scrollTop获取滚动时被隐藏的高度
+      div.scrollTop
+  })
+  ```
+
++ 页面尺寸事件
+
+  会在窗口尺寸改变的时候触发事件(请回忆媒体查询)，可以获取元素的可见部分宽高（不包含边框、margin、滚动条），即仅为页面的  内边距与内容区
+
+  clientWidth与clientHeight不包含外边距 与边框的 宽高
+
+  offsetWidth与offsetHeight 包含边框的宽高
+
+  offsetLeft与offsetTop获取距离自己定位父级元素的左上距离
+
+  ```js
+  window.addEventListener('resize',function(){
+      
+  })
+  ```
+
++ 日期对象Date
+
+  + 实例化
+
+    ```js
+    // 得到当前时间
+    const date = new Date()
+    console.log(date)
     
+    // 指定时间
+    const currentDate = new Date('2022-5-1 08:30:00')
+    console.log(currentDate)
+    ```
+
+  + Date对象相关方法
+
+    ```js
+    const date = new Date()
+    // 获取四位数年份
+    console.log(date.getFullYear())
+    // 获取月份 取值为0-11，使用应+1
+    console.log(date.getMonth())
+    // 获取星期 取值0-6,使用时+1
+    console.log(date.getDay)
+    // 获取小时
+    console.log(date.getHours())
+    // 获取分钟
+    console.log(date.getMinutes())
+    // 获取秒
+    console.log(date.getSeconds())
+    ```
+
+  + 时间戳
+
+    ```js
+    // 时间戳获取的三种方式
+    const date = new Date()
+    console.log(date.getTime())
+    
+    console.log(+new Date())
+    // 这种方式只能获取当前时间戳，前两种可以获取指定时间时间戳
+    console.log(Date.now())
+    
+    // 根据时间戳制作倒计时
+    ```
+
+    
+
++ 移动端事件
+
+  + touchstart：手指触摸到一个DOM元素时触发
+  + touchmove：手指在一个DOM元素上滑动时触发
+  + touchend：手指从一个DOM元素上移开时触发
+
++ 移动端swiper插件
+
+  自己去看  https://www.swiper.com.cn/
+
+
+
+
+
+### BOM模型
+
+------
+
+#### 一、BOM相关对象
+
+![image-20241126183937239](C:\Users\27120\AppData\Roaming\Typora\typora-user-images\image-20241126183937239.png)
+
++ 延迟函数setTimeout
+
+  ```js
+  // 定时器，每隔一秒调用一次函数
+  setInterval(function(){
+      
+  },1000)
+  // 延时函数，等待多少秒后，仅调用一次函数
+  let timer = setTimeout(function(){
+      // 十秒后执行该函数
+  },10000)
+  // 移除延时函数
+  clearTimeout(timer)
+  ```
+
+   
+
+
+
+#### 二、location对象
+
++ href地址属性
+
+  location对象拆分保存了URL地址的各个组成部分
+
+  ```js
+  // location是默认对象，每个页面可以直接使用与document属于同级对象，都是window下子元素
+  console.log(location)
+  // location.href存储的是当前页面的网址，href属性也可以自行赋值，实现页面跳转
+  location.href = 'www.baidu.com'
+  ```
+
++ search属性
+
+  ```js
+  // 对于网址为www.baidu.com?user=pink&pwd=123456
+  console.log(location.search)   // 打印的是?user=pink&pwd=123456
+  ```
+
++ hash属性
+
+  ```js
+  // 对于单页面应用，在跳转时不会刷新整个页面，而是仅修改某个区域的内容，此时网址会出现路由信息
+  // www.baidu.com#/friend 类似这种情况
+  console.log(location.hash)      // 打印#/friend
+  ```
+
+
+
+#### 三、navigator对象
+
++ userAgent属性
+
+  navigator对象记录了浏览器自身的相关信息
+
+  ```js
+  // 可以让页面跳转至移动端页面
+  (function(){
+      const userAgent = navigator.userAgent
+      // 验证是否为Android或iPhone
+      const android = userAgent.match(/(Android);?[\s\/]+([\d.]+)?/)
+      const iPhone = userAgent.match(/(iPhone\sOS)\s([\d_]+)/)
+      
+      if(android || iPhone){
+          location.href = 'http://m.itcast.cn'
+      }
+  })()
+  ```
+
+  
+
+#### 四、history对象
+
++ back()与forward()方法
+
+  history对象主要管理历史记录，该对象与浏览器地址栏的操作相对应，如前进、后退、历史记录等
+
+  ```js
+  const back = document.querySelector('button:first-child')
+  const forward = back.nextElementSibling
+  back.addEventListener('click',function(){
+      history.back()
+  })
+  forward.addEventListener('click',function(){
+      history.forward()
+  })
+  // 前进或后退num步
+  history.go(num)
+  ```
+
+
+
+#### 五、本地存储
+
++ 本地存储的概念
+
+  本地存储（Local Storage）是Web应用中的一种数据存储机制，它允许网站在用户的浏览器中存储数据，并且这些数据可以跨会话（session）持久保存。这意味着，即使关闭了浏览器，重新打开后，之前存储的数据仍然可以被访问。本地存储是HTML5 Web存储API的一部分，与早期的Cookies相比，它提供了更大的存储空间（通常为5MB或更多），并且存储的数据类型更加灵活（可以存储字符串、对象等）。
+
+  **本地存储在当前页面的信息，当页面跳转后，可以在其他页面获取。具体来说，使用localStorage存储数据后，这些数据可以在同一来源下的任何页面被访问，这意味只要页面属于同一网站，就可以在其他页面通过localStorage的API访问之前存储的数据，需要注意的是虽然本地存储提供了遍历的数据存储方式，但也存在一些限制和注意事项，例如，存储的数据量有限，并且存储的数据可以被任何访问该页面的js代码读取，因此不应存储敏感信息。此外对于大量数据的读写操作，本地存储的性能可能会受到影响。**
+
+  
+
++ 本地存储-localStorage
+
+  本地存储只能存储字符串类型，无论在存放时使用什么类型，在存储在本地后都会被转换为字符串，localStorage会永久存在本地，除非手动删除，但sessionStorage当浏览器窗口关闭后就会消失
+
+  ```js
+  // 存储数据 localStorage.setItem('key','value')  如果key已经存在就是该，不存在则为增
+  localStorage.setItem('uname','pink')
+  // 获取数据 localStorage.getItem(key)
+  localStorage.getItem('uname')
+  // 删除数据 localStorage.removeItem(key)
+  localStorage.removeItem('uname')
+  ```
+
++ 本地存储-sessionStorage
+
+  生命周期为关闭浏览器窗口，在同一个窗口下数据可以共享，以键值对的形式存储使用，用于与localStorage类似
+
+  ```js
+  
+  ```
+
++ 存储复杂数据类型使用JSON.stringify(复杂数据类型)
+
+  由于本地存储要求值必须为字符串类型，因此在存储复杂数据类型或对象类型时，需要将其进行JSON序列化转为字符串后进行存储
+
+  ```js
+  const obj = {
+      name:'pink',
+      age:18,
+      gender:'女'
+  }
+  // 在存储obj时需要先转换格式
+  localStorage.setItem('obj',JSON.stringify(obj))
+  // 获取时由于获取回来的是一段JSON序列化字符串，将其转换为对象需要反序列化
+  JSON.parse(localStorage.getItem('obj'))
+  ```
+
+
+
+#### 六、数组
+
++ map迭代数组
+
+  `map` 方法用于创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果。`map` 方法不会改变原始数组。
+
+  > array.map(callback(currentValue, index, array), thisArg)
+  >
+  > - callback：为数组中每个元素执行的函数，该函数接收三个参数：
+  >   - `currentValue`：数组中正在处理的当前元素。
+  >   - `index`（可选）：数组中正在处理的当前元素的索引。
+  >   - `array`（可选）：调用 `map` 方法的数组。
+  > - `thisArg`（可选）：执行 `callback` 函数时 `this` 的值。
+
+  ```js
+  const arr = ['red','blue','green']
+  // arr中每个元素都会调用map中的回调函数，且不改变元素在数组中的位置，不会更改原始数组
+  const newArr = arr.map(function(currentValue,index){
+      return currentValue + '颜色'
+  })
+  ```
+
+  
+
++ join拼接数组
+
+  `join` 方法用于将数组的所有元素连接成一个字符串。元素之间可以通过指定的分隔符进行分隔。如果不指定分隔符，则默认使用逗号 `,` 作为分隔符。
+
+  ```js
+  const fruits = ['Apple', 'Banana', 'Cherry'];
+  // 参数为字符串
+  const fruitString = fruits.join(' and ');
+  ```
+
+  
+
