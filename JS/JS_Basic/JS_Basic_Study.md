@@ -723,6 +723,9 @@ arr.shift   // 删除第一个元素
 
     ```js
     const date = new Date()
+    //在JavaScript中，Date 对象提供了一个名为 toLocaleString() 的方法，该方法用于根据本地时间惯例将日期和时间转换为字符串。这个方法非常有用，因为它能够考虑用户的地区设置和时区，从而生成一个对用户友好的日期时间字符串。
+    // 使用默认的区域设置
+    console.log(date.toLocaleString());
     // 获取四位数年份
     console.log(date.getFullYear())
     // 获取月份 取值为0-11，使用应+1
@@ -950,5 +953,649 @@ arr.shift   // 删除第一个元素
   const fruitString = fruits.join(' and ');
   ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### JS进阶
+
+------
+
+#### 一、作用域与作用域链
+
++ 局部作用域与全局作用域
+
+  局部作用域仅可以在定义它们的函数或块级作用域内部访问，这些变量和函数在外部是不可见的
+
+  局部作用域是es6提出的概念，（var声明的变量不会产生块级作用域，可以在块外部使用）
+
   
 
++ 作用域链
+
+  作用域链的本质是底层的变量查找机制，在函数被执行时，会优先在当前函数作用域中查找变量，如果当前作用域查找不到则会依次逐级查找父级作用域直到全局作用域
+
+  嵌套关系的作用域串联起来形成了作用域链，相同作用域链中按照从小到大的规则查找变量，子作用域可以访问父作用域，但父作用域无法访问子作用域
+
++ 垃圾回收机制
+
+  全局变量除非页面关闭，否则基本不会被回收，但局部变量当其所在的块级作用域中的代码执行完毕后，该局部变量就会被回收。
+
+  内存泄漏：程序分配的内存因为某个原因程序未释放或无法释放  叫做内存泄漏
+
+  + JS垃圾回收机制算法拓展-引用计数法
+
+    引用计数法定义内存不再使用，就是看一个对象是否有指向它的引用，没有引用了就回收对象，减少引用是通过将变量赋值为null或其他值，当所有指向该对象的变量全部赋值为null或其他值时也就是该对象没有指向它的引用了，就可以被回收，一般为以下情况
+
+    + 跟踪记录被引用的次数
+    + 如果被引用了一次，则+1
+    + 如果减少一个引用--
+    + 当引用为0时，就该回收了
+
+    引用计数法存在一个致命缺点：嵌套引用，如果两个对象相互引用，尽管它们不再使用，垃圾回收不会进行回收
+
+  + 标记清除法
+
+    标记清除法将'不再使用的对象'定义为'无法达到的对象'，就是从根部（全局对象）出发定时扫描内存中的对象。凡是能从根部到达的对象，都是还需要使用的。那些无法由根部无法触及到的对象被标记为不再使用，稍后进行回收
+
+
+
+#### 二、闭包（非常重要）
+
+假设将函数称为盒子，闭包就是指在一个大盒子中存在一些变量，我们可以通过return返回一些操作这些变量的函数，当调用外层函数时会返回一个对象，对象中具有操作大盒子变量的方法。
+
+当然也可以在大盒子中创建许多方法，通过return 返回，可以借助返回对象.方法的形式使用这些方法，通过这些方法操作原大盒子中的一些属性，因此我个人给闭包一个定义，若一个函数的返回值提供了一个或多个可以访问当前函数变量的方法，那么我们可以通过调用大函数拿到返回值的方式，即使大函数已经执行完毕，由于返回值中存在了许多操作函数中变量的方法，因此我们依旧可以对该变量进行访问
+
+```js
+function createCalculator(initialValue) {
+  let value = initialValue; // 闭包记住的变量
+
+  return {
+    increment: function() { // 一个闭包函数，执行增加操作
+      value++;
+      return value;
+    },
+    decrement: function() { // 另一个闭包函数，执行减少操作
+      value--;
+      return value;
+    },
+    multiplyBy: function(factor) { // 一个带参数的闭包函数，执行乘法操作
+      value *= factor;
+      return value;
+    },
+    getValue: function() { // 一个返回当前值的闭包函数
+      return value;
+    }
+  };
+}
+
+const calc = createCalculator(10); // 创建一个计算器实例
+console.log(calc.getValue()); // 输出 10
+console.log(calc.increment()); // 输出 11
+console.log(calc.multiplyBy(2)); // 输出 22
+console.log(calc.decrement()); // 输出 21
+```
+
++ var变量提升
+
+  在执行时会将var声明的变量提升至当前作用域的最前面，只提升声明，不提升赋值
+
+  ```js
+  // 相当于var num放在了打印前，但没有赋值
+  console.log(num+'件')   // 输出undefined
+  var num = 10
+  ```
+
+
+
+#### 三、函数进阶
+
++ 函数提升：与变量提升类似，是指函数在声明之前即可被调用，会把所有函数声明提升至当前作用域最前面
+
+  ```js
+  fn()  // 不会报错
+  function fn(){
+      console.log('函数提升')
+  }
+  
+  fun()     // 报错，var声明函数表达式，会将var fun的声明放在最前面，但未赋值不是函数，不能调用
+  var fun = function(){
+      
+  }
+  ```
+
++ 函数参数---动态参数arguments
+
+  arguments是函数内部内置的伪数组变量，它包含了调用函数时传入的所有实参
+
+  ```js
+  // 不设置参数，在函数内部有动态参数伪数组
+  function getSum(){
+      console.log(arguments)  // [1,2,3]
+      let sum
+      for(let i = 0; i < arguments.length; i++){
+          sum += arguments[i]
+      }
+  }
+  
+  getSum(1,2,3)
+  ```
+
++ 函数参数---剩余参数
+
+  当函数采用剩余参数时，是允许给定形参的，当实参个数大于形参个数时，会将多出来的参数给到剩余参数数组中
+
+  ```js
+  function getSum(a,b,...arr){
+      // 此时a=1，b=2，arr=[3,4,5,6]
+  }
+  getSum(1,2,3,4,5,6)
+  ```
+
++ 展开运算符
+
+  ```js
+  // 展开运算符可以将一个数组在输出时展开
+  const arr = [1,2,3,4,5]
+  console.log(...arr)  // 1 2 3 4 5 
+  
+  
+  // 典型运用场景：求数组最大值（最小值）、合并数组等
+  let max = Math.max(...arr)
+  const arr1 = [1,2,3,4,5]
+  const arr2 = [10,12,34,57,20]
+  const arr = [...arr1,...arr2]
+  ```
+
++ 箭头函数
+
+  匿名函数中没有arguments，但可以使用匿名函数
+
+  ```js
+  // 初始写法
+  const fn = (a,b,c)=>{
+      // 代码
+  }
+  // 若只有一个参数，可以省略小括号
+  const fn = a => {
+      // 代码
+  }
+  // 若函数只有一行
+  const fn = a => console.log(a)
+  
+  // 若函数只有一个返回值,后边那一行当返回值
+  const fn = x => x+x
+  
+  // 返回值可以为对象
+  const fn = name = ({userName:name})
+  ```
+
++ 箭头函数的this
+
+
+
+#### 四、解构赋值ES6语法
+
++ 数组解构
+
+  + 基本结构
+
+    ```js
+    // 一对一赋值,以下会将对应的值赋值给对应的变量
+    let arr = [1,2,3,4]
+    let [a,b,c,d] = arr
+    ```
+
+  + 跳过元素
+
+    ```js
+    // 在基本结构的基础上，将某个元素在声明时空出，即可跳过该元素的赋值
+    let [a,,c,d] = [1,2,3,4] // 此时a为1，c为3，d为4
+    ```
+
+  + 设置默认值
+
+    ```js
+    // 在元素声明时直接给定默认值，当给定位置对应的赋值数组中没有对应的值时会使用默认值
+    let [a,b=10,c] = [1,2,3] // 与基本结构相同b会被赋值为2
+    
+    // 没有给定值
+    let [a,b=10] = [1]  // b的值为2
+    
+    // 若声明数组的长度大于赋值数组的长度，且超出部分没有给定默认值，会被设置为undefined
+    let [a,b=10,c,d] = [1,2]  // b的值为2，c、d全为undefined
+    ```
+
+  + 嵌套解构
+
+    ```js
+    // 解构可以通过嵌套的模式解构多维数组,就是保证两边结构相同，对应位置有值就赋值，没值默认，最后undefined
+    let [a,[b,c],d] = [1,[2,3],4]  
+    ```
+
+  + 邪门写法
+
+    ```js
+    // 剩余元素写法
+    let [a,...rest] = [1,2,3,4]   // a=1,rest=[2,3,4]
+    ```
+
+  + 最终用法
+
+    ```js
+    function method([a,b,c]){
+        
+    }
+    method([1,2,3])  // a=1,b=2,c=3
+    
+    function method([a,b=10,c,...rest]){}
+    method([1,,3,4,5,6])    // 1 10 3 [4, 5, 6]
+    ```
+
++ 对象解构---与数组解构基本类似
+
+  ```js
+  // 对应同名对象解构
+  let {name,age} = {name:'pink',age:18}
+  let {name} = {}
+  // 对应非同名解构,userName='pink',UserAge=18
+  let {name:userName,age:userAge} = {name:'pink',age:18}
+  
+  // 默认解构，有值替换，没值默认
+  let {name:userName,age:userAge,gender:userGender='男'} = {name:'pink',age:18}  // gender为男
+  let {name:userName,age:userAge,gender:userGender='男'} = {name:'pink',age:18,gender='女'}
+  
+  // 解构赋值与函数参数
+  function greet({ name, age }) {
+      console.log(`Hello, my name is ${name} and I am ${age} years old.`);
+  }
+  let person = {
+      name: 'Alice',
+      age: 25
+  }
+  greet(person)
+  ```
+
+
+
+#### 五、加强for循环
+
+```js
+// forEach方法,第一个参数为当前元素必选，第二个可选
+数组.forEach(function (当前数组元素，当前元素索引号){
+    // 函数体
+})
+let arr = [1,2,3,4,5,6]
+arr.forEach(function(item,index){
+    console.log(item)
+    console.log(index)
+})
+```
+
+
+
+#### 六、创建对象的三种方式
+
++ class关键字
+
+  与java类似，是从ES6定义的，用法与java基本类似
+
+  + 区别1：构造方法的名字固定为constructor
+  + 区别2：静态方法与属性前加static关键字，其余为非静态
+
++ 使用对象字面量
+
+  对象字面量是最常见且最简洁的创建对象的方法。它允许你直接在代码中使用大括号 `{}` 来定义对象的属性和方法。
+
+  ```js
+  let person = {
+      name: "Alice",
+      age: 30,
+      greet: function() {
+          console.log("Hello, my name is " + this.name);
+      }
+  };
+   
+  person.greet();
+  ```
+
++ 使用构造函数创建对象
+
+  构造函数是一种可以创建特定类型对象的函数。构造函数的名字通常以大写字母开头，以区别于普通函数。你可以使用 `new` 关键字来调用构造函数，并创建一个新的对象实例。
+
+  ```js
+  function Person(name, age) {
+      this.name = name;
+      this.age = age;
+      this.greet = function() {
+          console.log("Hello, my name is " + this.name);
+      };
+  }
+   
+  let person = new Person("Charlie", 28);
+  person.greet();
+  ```
+
++ 静态属性（与java一样，但写法有所不同）
+
+  ```js
+  // 声明构造方法
+  function Person(name,age){
+      // 在内部声明赋值的为非静态属性
+  }
+  // 直接使用函数名.属性名添加函数
+  Person.arms = 2
+  Person.walk = function (){
+      console.log('人都有两个胳膊')
+      console.log(this.arms)
+  }
+  ```
+
+
+
+#### 七、内置对象方法
+
++ 包装类
+
+  JS的基本数据类型，底层是拥有对应的包装类的，请对比java（类似）
+
++ Object内置类型
+
+  与java类似，在js中存在原型链，几乎所有的对象类型都会隐式继承于Object类，除了基于null原型或特定环境的对象，如Array和function等等。
+
+  + Object.keys() 静态方法
+
+    ```js
+    // 获取对象中所有属性的键（即属性名）
+    const  object = {
+        name:'pink',
+        age:18
+    }
+    // 获取所有的key值，返回值为一个数组，包含所有的属性名，采用数组解构可以直接赋值
+    const arr = object.keys(object)
+    ```
+
+  + Object.values() 静态方法
+
+    ```js
+    const object = {
+        name:'pink',
+        age:18
+    }
+    // 返回所有value值
+    const arr = object.values(object)
+    ```
+
+  + Object.assign(o1,o2)对象拷贝
+
+    ```js
+    // 将o2对象的引用赋值给o1,通过该方式的拷贝的是引用，也就是两个对象指向了同一份引用
+    const o = {
+        name:'pink',
+        age:18
+    }
+    // 将o赋值为o1,指向了同一份引用
+    Object.assign(o1,o)
+    ```
+
+
+
++ Array内置类型
+
+  Array数组提供了许多方法，join拼接字符串，find查找元素，concat合并数组，sort排序、findIndex查找指定索引值
+
+  + forEach方法
+
+    ```js
+    // 遍历数组，请查看本章第五节加强for循环
+    ```
+
+  + filter(function(currentValue, index, arr), thisArg)
+
+    ```js
+    // 数组过滤,其中函数必须提供boolean形式返回值，真为保留  thisArg用于指定函数的this指向，箭头函数无效
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+     
+    // 创建一个新数组，包含所有大于5的元素
+    const filteredNumbers = numbers.filter(function(number) {
+      return number > 5;
+    });
+     
+    console.log(filteredNumbers); // 输出: [6, 7, 8, 9, 10]
+    
+    ```
+
+  + map迭代处理数据
+
+    ```js
+    // map方法也必须提供返回值，map会将每个数组元素作相同的处理，并返回，同时也提供了this指向，箭头函数失效
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    const mapNumber = numbers.map(function(number){
+        return number*=2
+    },this) // this可以指定过滤条件函数中的this，但此时函数不能使用箭头函数，否则会从上下文中捕获this
+    ```
+
+  + reduce累计器
+
+    ```js
+    // reduce的工作原理为：对每个元素操作过后的最后的返回值赋值给init，最后将init返回
+    // reduce遍历每个数组元素，但最后的返回值只有一个，因此常用于求数组和，求最大/小值，平均值，字符串凭借等等
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    const sum = numbers.reduce(function(init,current){
+       return init+=current                  
+    })
+    
+    const sum = numbers.reduce(function(init,current){
+        // initValue是为init的赋初值
+    },initValue)
+    ```
+
++ String静态(与Java类似)
+
+  length求长度、split分割、substring截取、startsWith以..开头，大小写转换，字符替换、匹配
+
+
+
+#### 八、原型（非常重要）
+
++ 原型出现的原因
+
+  使用构造函数的方式创建对象（也就是new 构造函数() ），每次创建对象时构造函数中的属性和方法都会创建一份副本保存在该对象的引用中，以供其调用。**这存在一个问题就是，当创建对象的个数非常多时，每个对象都会保存一个方法副本，那么一千个、一万个方法副本 就可能会引起内存溢出，因此我们希望每个对象都指向了一份公用的方法原型中，在调用时每个对象都去访问该原型方法，不需要创建副本，共用一个对象即可**
+
++ 原型方法
+
+  在JavaScript开发中，通常建议避免在构造方法（构造函数）内部创建方法，而是应该直接将方法创建在原型（`prototype`）内部。这种做法有几个重要的原因：
+
+  1. **内存效率**：如果在构造方法内部创建方法，那么每次创建新对象时都会为该对象创建一个新的方法副本。这不仅浪费内存，而且降低了性能，因为方法代码被重复存储了多次。相反，如果将方法定义在原型上，那么所有实例都可以共享同一个方法实现，从而节省内存并提高性能。
+  2. **原型链继承**：JavaScript中的对象通过原型链来继承属性和方法。将方法定义在原型上，可以确保这些方法能够被所有实例对象所继承。这是JavaScript中实现继承的核心机制之一。
+  3. **封装和可维护性**：将方法定义在原型上，可以使代码更加清晰和易于维护。构造方法应该专注于初始化对象的实例变量，而方法定义则应该放在原型上，这样更符合面向对象编程的封装原则。
+  4. **避免意外的行为**：如果在构造方法内部修改原型（例如，添加新方法），这可能会导致意外的行为，特别是当构造方法已经被多次调用，并且已经创建了对象实例时。这种修改会影响到所有已经存在的实例，以及未来创建的实例。
+
++ 创建原型方法的方式
+
+  ```js
+  function Person(){
+      // 属性
+      // 请不要在构造函数内部创建方法，因为每当创建一个对象时，构造函数内部的函数都会被创建一份副本
+  }
+  // 通过以下方式创建的函数只会存在一份，每次通过函数调用都是调用的原型对象上的方法
+  Person.prototype.方法名 = function(){
+      
+  }
+  ```
+
++ constructor属性
+
+  用一句话描述 构造函数拥有原型对象，而原型对象的constructor属性反过来又指向了构造函数本身
+
+  ```js
+  function Person(){
+      
+  }
+  // 构造函数拥有原型对象
+  Person.prototype
+  // 原型对象的constructor属性指向了函数本身
+  Person.prototype.constructor === Person 
+  ```
+
+  请注意以下问题
+
+  ```js
+  // 当原型对象挂载很多方法时，可以直接调整整个原型对象，但会导致constructor属性丢失，需要重新制定
+  function Person(){
+      
+  }
+  Person.prototype = {
+      // 重新指定constructor属性
+      constructor:Person,
+      方法1:function(){},
+      方法2:function(){},
+      方法3:function(){}
+  }
+  ```
+
++ 对象原型 _proto\_
+
+  对象原型_proto\_指向了构造函数的原型对象prototype,之所以对象可以使用构造函数prototype原型对象的属性和方法，就是因为对象有\_proto\_原型的存在
+
++ 原型总结与原型链
+
+  + 原型总结
+
+    1. 构造函数拥有prototype对象，记录了构造函数的原型对象，类似与“模型与模型概念”，构造函数（模型）可以定义各种属性，而原型对象（prototype）上定义了固定的函数与属性供对象使用。
+    2. 对于prototype对象在赋值时，若使用{}赋值，应该重新指定其constructor属性，指定其构造函数
+    3. 当对象通过构造函数创建后，会存在[[Prototype]]属性指定其对象原型
+    4. 综上：若使用上述模型的比喻，可以看做  模型对象通过“构造函数”创建，但其本质上是仿照模型概念而生成的（对象的[[Prototype]]指向了其对象原型），因此对象拥有 构造函数的普通属性 也拥有原型对象的公共方法与属性
+
+  + 原型链
+
+    原型链是指当前对象拥有一个 对象原型 指向了自己的原型对象，原型对象身上存在属性constructor指向了构造方法，以及[[Prototype]]指向了自己的原型；（可以想象为当前对象身上存在一条链，每一个链点都有一个尾巴指向了自己的构造函数）
+
++ 继承
+
+  将希望继承的父类放入当前构造函数的”蓝图“（也就是原型对象中），并且重新指定自己的constructor属性，因为赋值时若使用 = 会覆盖该属性，**同时有一个问题需要解决，当两个子类的prototype属性同时指向了同一个父类，当为其中一个子类添加自己的公共方法时，需要修改prototype对象，向内添加方法或属性，直接修改了该对象，会使得另一个子类的prototype对象发生变化，因此在对子类prototype进行赋值时，需要通过new 父类()的方式指定prototype，方便添加子类独有的公共属性和方法**
+
+  ```js
+  function People(){
+      this.eyes = 2
+      this.head = 1
+  }
+  function Woman(){
+      
+  }
+  Woman.prototype = new People()
+  // 将自身构造器指回自身
+  Woman.prototype.constructor = Woman
+  // 向子类添加独有方法
+  Woman.prototype.baby = function(){
+      console.log('我会生孩子')
+  }
+  
+  function Man(){
+      
+  }
+  Man.prototype = new People()
+  Man.prototype.constructor = Man
+  ```
+
+
+
+
+#### 九、拷贝
+
++ 深浅拷贝
+
+  + 浅拷贝（仅复制引用）
+
+    ```js
+    // 使用Object.assign()方法
+    // 将o2对象的引用赋值给o1,通过该方式的拷贝的是引用，也就是两个对象指向了同一份引用
+    const o = {
+        name:'pink',
+        age:18
+    }
+    Object.assign(o1,o)
+    
+    //使用展开运算符（...）
+    let original = { a: 1, b: { c: 2 } };
+    let shallowCopy = { ...original };
+    
+    // 使用slice()方法
+    let originalArray = [1, 2, 3, { a: 4 }];
+    let copiedArray = originalArray.slice(); 
+    // 使用concat方法
+    let originalArray = [1, 2, 3, { a: 4 }];
+    let copiedArray = originalArray.concat();
+    ```
+
+  + 深拷贝
+
+    ```js
+    // 通过json转为字符串，在转回来
+    let original = { a: 1, b: { c: 2 } };
+    let deepCopy = JSON.parse(JSON.stringify(original)); 
+    // 通过lodash中的cloneDeep实现拷贝，需要引入相关库，使用时再查询
+    const copiedObject = _.cloneDeep(originalObject);
+    ```
+
++ 异常(与java一样)
+
+  try-catch-finally，以及throw new error('')
+
+
+
+#### 十、收尾处理
+
++ call方法
+
+  ```js
+  // 使用方法调整函数，同时指定被调用函数的this值
+  // call就是函数的调用，只是在调用时通过call函数指定了this的值
+  函数名.call(thisArg,arg1,arg2)
+  
+  const obj = {
+      uname:'pink'
+  }
+  function fn(){
+      
+  }
+  // 将fn的this值调整为obj
+  fn.call(obj)
+  ```
+
++ apply方法
+
+  ```js
+  // 与call类似，只不过第一个参数为this值，第二个参数为原函数的参数数组
+  ```
+
++ bind方法
+
+  ```js
+  // bind不会调用函数
+  const btn = document.querySelector('button')
+  btn.addEventListener('click',function(){
+      this.disable = true
+      // setTimeout的调用者是window
+      setTimeout(function(){
+          // 若直接使用this，指向的是window，可以通过bind调整this,直接函数.bind(NewThis)
+      }.bind(btn),2000)
+  })
+  ```
+
++ 防抖与节流
+
+  防抖：在单位时间内频繁触发事件，若上次事件还没结束，会直接打断，重新执行（即只执行最后一次，类似王者回城，打断需重开始）
+
+  节流：在事件执行过程中，不允许该事件再次触发，需等待事件执行结束才可触发（王者放技能，一个放完才能放第二个）
